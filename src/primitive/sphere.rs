@@ -56,8 +56,8 @@ mod tests {
 
     #[test]
     fn sphere_at_origin_closest_intersection() {
-        let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), Vec3::new(0.0, 0.0, 1.0));
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 1.0);
+        let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), *consts::FORWARD);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         assert!((hit.distance - 1.0).abs() <= consts::EPSILON);
@@ -67,24 +67,24 @@ mod tests {
     #[test]
     fn sphere_at_origin_miss() {
         let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), glm::normalize(&Vec3::new(0.0, 1.0, 1.0)));
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 1.0);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
         let hit = sphere.nearest_intersection(&ray);
         assert!(hit.is_none());
     }
 
     #[test]
     fn sphere_at_origign_cull_rear_intersections() {
-        let ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0));
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, 0.0), 1.0);
+        let ray = Ray::new(*consts::ORIGIN, *consts::FORWARD);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         assert!((hit.distance - 1.0).abs() <= consts::EPSILON);
-        assert!(glm::distance(&hit.normal, &Vec3::new(0.0, 0.0, 1.0)) <= consts::EPSILON);
+        assert!(glm::distance(&hit.normal, &consts::FORWARD) <= consts::EPSILON);
     }
 
     #[test]
     fn sphere_translated_closest_intersection() {
-        let ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0));
+        let ray = Ray::new(*consts::ORIGIN, *consts::FORWARD);
         let sphere = Sphere::new(Vec3::new(0.0, 0.0, 11.0), 1.0);
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
