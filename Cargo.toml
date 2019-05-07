@@ -1,0 +1,13 @@
+[package]
+name = "raytracer"
+version = "0.1.0"
+authors = ["Audrey Baxter <baxtea@pm.me>"]
+edition = "2018"
+
+[dependencies]
+nalgebra-glm = "0.4"
+ord_subset = "3.1"
+
+[features]
+double-precision = []
+default = ["double-precision"]
