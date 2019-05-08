@@ -79,7 +79,7 @@ mod tests {
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         assert!((hit.distance - 1.0).abs() <= consts::EPSILON);
-        assert!(glm::distance(&hit.normal, &consts::FORWARD) <= consts::EPSILON);
+        assert!(glm::distance(&hit.normal, &*consts::FORWARD) <= consts::EPSILON);
     }
 
     #[test]

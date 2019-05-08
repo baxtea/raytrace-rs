@@ -7,9 +7,9 @@ pub use std::f64::consts::*;
 pub use std::f32::consts::*;
 
 #[cfg(feature="double-precision")]
-pub static EPSILON: Scalar = 1.0e-9;
+pub const EPSILON: Scalar = 1.0e-9;
 #[cfg(not(feature="double-precision"))]
-pub static EPSILON: Scalar = 1.0e-6;
+pub const EPSILON: Scalar = 1.0e-6;
 
 lazy_static! {
     pub static ref ORIGIN  : Vec3 = Vec3::new(0.0, 0.0, 0.0);
