@@ -13,6 +13,8 @@ pub const EPSILON: Scalar = 1.0e-6;
 
 lazy_static! {
     pub static ref ORIGIN  : Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    pub static ref ZERO    : Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    pub static ref ONE     : Vec3 = Vec3::new(1.0, 1.0, 1.0);
 
     pub static ref RIGHT   : Vec3 = Vec3::new( 1.0,  0.0,  0.0);
     pub static ref LEFT    : Vec3 = Vec3::new(-1.0,  0.0,  0.0);
