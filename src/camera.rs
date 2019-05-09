@@ -1,6 +1,6 @@
 use nalgebra_glm as glm;
 use crate::math::*;
-use crate::raycast::Ray;
+use crate::Ray;
 use consts::{RIGHT, UP, FORWARD};
 
 #[derive(Debug, Clone)]
@@ -212,9 +212,9 @@ mod tests {
 
         // The view matrix is created fresh with the new camera
         assert!(!camera.is_view_invalid());
-        assert!(glm::length(&(camera.get_right() - *consts::RIGHT)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_up() - *consts::UP)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_direction() - *consts::FORWARD)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_right() - *consts::RIGHT)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_up() - *consts::UP)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_direction() - *consts::FORWARD)) <= consts::EPSILON);
     }
 
     #[test]
@@ -224,9 +224,9 @@ mod tests {
 
         // Force the camera to recreate the view matrix from its position and quaternion
         camera.invalidate_view();
-        assert!(glm::length(&(camera.get_right() - *consts::RIGHT)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_up() - *consts::UP)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_direction() - *consts::FORWARD)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_right() - *consts::RIGHT)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_up() - *consts::UP)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_direction() - *consts::FORWARD)) <= consts::EPSILON);
     }
 
     #[test]
@@ -236,16 +236,16 @@ mod tests {
 
         // For an FPS camera, the yaw axis should remain (0,1,0) regardless of any transformations
         camera.pitch(-consts::FRAC_PI_2);
-        assert!(glm::length(&(camera.get_yaw_axis() - *consts::UP)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_yaw_axis() - *consts::UP)) <= consts::EPSILON);
         camera.yaw(consts::PI);
 
         assert!(camera.is_view_invalid());
         camera.update_view();
         assert!(!camera.is_view_invalid());
 
-        assert!(glm::length(&(camera.get_right() - *consts::LEFT)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_up() - *consts::FORWARD)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_direction() - *consts::UP)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_right() - *consts::LEFT)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_up() - *consts::FORWARD)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_direction() - *consts::UP)) <= consts::EPSILON);
     }
 
     #[test]
@@ -255,23 +255,23 @@ mod tests {
 
         // For a freeform camera, the yaw axis should change to reflect the camera's local coordinate system
         camera.pitch(-consts::FRAC_PI_2);
-        assert!(glm::length(&(camera.get_yaw_axis() - *consts::BACKWARD)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_yaw_axis() - *consts::BACKWARD)) <= consts::EPSILON);
         camera.yaw(consts::PI);
 
         assert!(camera.is_view_invalid());
         camera.update_view();
         assert!(!camera.is_view_invalid());
 
-        assert!(glm::length(&(camera.get_right() - *consts::LEFT)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_up() - *consts::BACKWARD)) < consts::EPSILON);
-        assert!(glm::length(&(camera.get_direction() - *consts::DOWN)) < consts::EPSILON);
+        assert!(glm::length(&(camera.get_right() - *consts::LEFT)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_up() - *consts::BACKWARD)) <= consts::EPSILON);
+        assert!(glm::length(&(camera.get_direction() - *consts::DOWN)) <= consts::EPSILON);
     }
 
     #[test]
     fn primary_ray_cast() {
         let camera = Camera::default();
         let ray = camera.primary_ray(0.0, 0.0);
-        assert!(glm::length(&ray.origin) < consts::EPSILON);
-        assert!(glm::length(&(ray.direction - Vec3::new(0.0, 0.0, -1.0))) < consts::EPSILON);
+        assert!(glm::length(&ray.origin) <= consts::EPSILON);
+        assert!(glm::length(&(ray.direction - Vec3::new(0.0, 0.0, -1.0))) <= consts::EPSILON);
     }
 }

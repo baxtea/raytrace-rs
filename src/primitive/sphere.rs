@@ -1,5 +1,5 @@
 use crate::math::*;
-use crate::raycast::{Ray, Hit};
+use crate::ray::{Ray, Hit};
 use nalgebra_glm as glm;
 use super::Primitive;
 
@@ -50,7 +50,7 @@ impl Primitive for Sphere {
 #[cfg(test)]
 mod tests {
     use crate::math::*;
-    use crate::raycast::Ray;
+    use crate::ray::Ray;
     use super::{Primitive, Sphere};
     use nalgebra_glm as glm;
 

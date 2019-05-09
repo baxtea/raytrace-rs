@@ -1,6 +1,13 @@
 #![feature(const_fn)]
 
 pub mod math;
-pub mod raycast;
+mod ray;
 pub mod primitive;
-pub mod camera;
+mod camera;
+mod screen;
+mod world;
+
+pub use ray::{Hit, Ray};
+pub use camera::Camera;
+pub use screen::Screen;
+pub use world::World;
