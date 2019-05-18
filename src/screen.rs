@@ -1,10 +1,10 @@
 use crate::math::*;
 use crate::{Camera, World, Ray};
-use nalgebra_glm as glm;
-
+use crate::Color3;
+use rgb::RGB8;
 #[cfg(feature="parallel")]
-use rayon::{prelude::*, iter::IndexedParallelIterator as Iter};
-#[cfg(not(feature="parallel"))]
+use rayon::prelude::*;
+
 use std::iter::Iterator as Iter;
 
 pub struct Screen {
@@ -33,10 +33,7 @@ impl Screen {
         let w = self.width;
         let c = camera.clone();
 
-        #[cfg(not(feature="parallel"))]
         let it = (0..self.width*self.height).into_iter();
-        #[cfg(feature="parallel")]
-        let it = (0..self.width*self.height).into_par_iter();
         it.map(move |i| {
             let px = i % w;
             let py = i / w;
@@ -49,9 +46,10 @@ impl Screen {
 
     // TODO: trace rays instead of only casting
     // TODO: shade based on material
-    pub fn render(&self, camera: &Camera, world: &World) -> Vec<u8> {
+    pub fn render(&self, camera: &Camera, world: &World) -> Vec<RGB8> {
         // floating-point intermediate format, 0-1
-        let mut pixels = vec![*consts::ZERO; self.width * self.height];
+        let black = Color3::new(0.0, 0.0, 0.0);
+        let mut pixels = vec![black; self.width * self.height];
         let rays = self.primary_rays(camera);
 
         #[cfg(feature="parallel")]
@@ -59,22 +57,18 @@ impl Screen {
         #[cfg(not(feature="parallel"))]
         let it = rays.zip(pixels.as_mut_slice().into_iter()); // TODO: zip_eq for std iterators?
 
-        let one: Vec3 = Vec3::new(1.0,1.0,1.0);
-        it.for_each(|(r, p): (Ray, &mut Vec3)| {
+        let one = Vec3::new(1.0,1.0,1.0);
+        it.for_each(|(r, p): (Ray, &mut Color3)| {
             if let Some(hit) = world.cast(&r) {
-                let n = (hit.normal + one) / 2.0;
+                // Rescale hit.normal, which is in the range [-1, 1], into the range [0, 1]
+                let n = Color3::from_vec3((hit.normal + one) / 2.0);
                 *p = n;
             } else {
-                *p = glm::zero();
+                *p = black;
             }
         });
 
         // convert to u8, 0-255
-        pixels.into_iter().map(|v| {
-            let r = (v[0] * 255.0) as u8;
-            let g = (v[1] * 255.0) as u8;
-            let b = (v[2] * 255.0) as u8;
-            vec![r,g,b]
-        }).flatten().collect()
+        pixels.into_iter().map(|v| v.to_rgb8()).collect()
     }
 }
