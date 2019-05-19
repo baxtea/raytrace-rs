@@ -73,11 +73,10 @@ impl Material {
         let nol = glm::clamp_scalar(nol, 0.0, 1.0);
         // TODO: weights k_s and k_d
         ((diffuse + specular) * nol).clamped()
-        //Color3::gray(d).clamped()
     }
 }
 
-// iron
+// a fairly rough pink material
 impl Default for Material {
     fn default() -> Self {
         Material::new(0.5, 0.0, Color3::new(1.0, 0.0, 1.0), 3.5)
