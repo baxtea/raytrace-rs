@@ -1,4 +1,6 @@
 use crate::math::*;
+use crate::Material;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Ray {
@@ -18,17 +20,19 @@ impl Ray {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Hit {
     pub distance: Scalar,
     pub normal: Vec3,
-    // TODO: more information (material, primitive id, etc)
+    pub material: Arc<Material>,
+    // TODO: more information (primitive id, etc)
 }
 impl Hit {
-    pub fn new(distance: Scalar, normal: Vec3) -> Self {
+    pub fn new(distance: Scalar, normal: Vec3, material: &Arc<Material>) -> Self {
         Hit {
             distance: distance,
             normal: normal,
+            material: material.clone(),
         }
     }
 }

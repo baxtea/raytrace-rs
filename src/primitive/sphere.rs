@@ -1,18 +1,21 @@
 use crate::math::*;
-use crate::ray::{Ray, Hit};
+use crate::{Ray, Hit, Material};
 use nalgebra_glm as glm;
 use super::Primitive;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: Scalar,
+    pub material: Arc<Material>,
 }
 impl Sphere {
-    pub const fn new(center: Vec3, radius: Scalar) -> Self {
+    pub fn new(center: Vec3, radius: Scalar, material: &Arc<Material>) -> Self {
         Sphere {
             center: center,
             radius: radius,
+            material: material.clone(),
         }
     }
 }
@@ -36,7 +39,7 @@ impl Primitive for Sphere {
             let dist = if dist1 >= 0.0 { dist1 } else { dist2 };
             if dist >= 0.0 {
                 Some(
-                    Hit::new(dist, glm::normalize(&(ray.at(dist) - self.center)))
+                    Hit::new(dist, glm::normalize(&(ray.at(dist) - self.center)), &self.material)
                 )
             } else {
                 None
@@ -50,14 +53,15 @@ impl Primitive for Sphere {
 #[cfg(test)]
 mod tests {
     use crate::math::*;
-    use crate::ray::Ray;
+    use crate::{Ray, Material};
     use super::{Primitive, Sphere};
     use nalgebra_glm as glm;
+    use std::sync::Arc;
 
     #[test]
     fn sphere_at_origin_closest_intersection() {
         let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), *consts::FORWARD);
-        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0, &Arc::new(Material::default()));
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         assert!((hit.distance - 1.0).abs() <= consts::EPSILON);
@@ -67,7 +71,7 @@ mod tests {
     #[test]
     fn sphere_at_origin_miss() {
         let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), glm::normalize(&Vec3::new(0.0, 1.0, 1.0)));
-        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0, &Arc::new(Material::default()));
         let hit = sphere.nearest_intersection(&ray);
         assert!(hit.is_none());
     }
@@ -75,7 +79,7 @@ mod tests {
     #[test]
     fn sphere_at_origign_cull_rear_intersections() {
         let ray = Ray::new(*consts::ORIGIN, *consts::FORWARD);
-        let sphere = Sphere::new(*consts::ORIGIN, 1.0);
+        let sphere = Sphere::new(*consts::ORIGIN, 1.0, &Arc::new(Material::default()));
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         assert!((hit.distance - 1.0).abs() <= consts::EPSILON);
@@ -85,7 +89,7 @@ mod tests {
     #[test]
     fn sphere_translated_closest_intersection() {
         let ray = Ray::new(*consts::ORIGIN, *consts::FORWARD);
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, 11.0), 1.0);
+        let sphere = Sphere::new(Vec3::new(0.0, 0.0, 11.0), 1.0, &Arc::new(Material::default()));
         let hit = sphere.nearest_intersection(&ray).unwrap();
 
         println!("{:?} {:?}", sphere, hit);

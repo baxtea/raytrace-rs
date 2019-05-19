@@ -1,22 +1,27 @@
 extern crate raytracer;
 use raytracer::math::*;
 use raytracer::primitive::Sphere;
-use raytracer::{Camera, Screen, World};
+use raytracer::{Camera, Screen, World, Material};
 use nalgebra_glm as glm;
 
-use std::{path::Path, fs::File, io::BufWriter};
+use std::{path::Path, fs::File, io::BufWriter, sync::Arc};
 use png::HasParameters;
 
+fn slice_bytes<T>(slice: &[T]) -> &[u8] {
+    unsafe {
+        std::slice::from_raw_parts(
+            slice.as_ptr() as *const u8,
+            slice.len() * std::mem::size_of::<T>())
+    }
+}
+
 fn main() {
-    let sphere = Sphere::new(glm::zero(), 1.0);
+    let sphere = Sphere::new(glm::zero(), 1.0, &Arc::new(Material::default()));
     let world = World { primitives: vec![Box::new(sphere)] };
     let camera = Camera::new(Vec3::new(0.0, 0.0, 2.0), glm::quat_identity(), consts::FRAC_PI_3, 16.0/9.0, None);
     let screen = Screen::new(1920, 1080);
     let image = screen.render(&camera, &world);
-    let image_bytes: Vec<u8> = image.into_iter()
-        .map(|rgb| vec![rgb.r, rgb.g, rgb.b])
-        .flatten()
-        .collect();
+    let image_bytes = slice_bytes(&image);
 
     let path = Path::new(r"out/spherecast.png");
     let file = File::create(path).unwrap();

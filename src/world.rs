@@ -4,6 +4,7 @@ use ord_subset::OrdSubsetIterExt;
 
 pub struct World {
     pub primitives: Vec<Box<dyn Primitive + Send + Sync>>,
+    // TODO: lights
     // TODO: acceleration data structure
 }
 impl World {

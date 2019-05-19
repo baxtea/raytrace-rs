@@ -1,6 +1,6 @@
 use crate::math::*;
-use crate::{Camera, World, Ray};
-use crate::Color3;
+use crate::{Camera, World, Ray, Color3};
+use nalgebra_glm as glm;
 use rgb::RGB8;
 #[cfg(feature="parallel")]
 use rayon::prelude::*;
@@ -45,7 +45,6 @@ impl Screen {
     }
 
     // TODO: trace rays instead of only casting
-    // TODO: shade based on material
     pub fn render(&self, camera: &Camera, world: &World) -> Vec<RGB8> {
         // floating-point intermediate format, 0-1
         let black = Color3::new(0.0, 0.0, 0.0);
@@ -57,12 +56,15 @@ impl Screen {
         #[cfg(not(feature="parallel"))]
         let it = rays.zip(pixels.as_mut_slice().into_iter()); // TODO: zip_eq for std iterators?
 
-        let one = Vec3::new(1.0,1.0,1.0);
+        let dir_to_light = glm::normalize(&Vec3::new(1.0, 1.0, 1.0)); // mock directional light
         it.for_each(|(r, p): (Ray, &mut Color3)| {
             if let Some(hit) = world.cast(&r) {
-                // Rescale hit.normal, which is in the range [-1, 1], into the range [0, 1]
-                let n = Color3::from_vec3((hit.normal + one) / 2.0);
-                *p = n;
+                let color = hit.material.shade(&r, &hit.normal, &dir_to_light);
+                if color.r <= 1.0 && color.g <= 1.0 && color.b <= 1.0 {
+                    *p = color;
+                } else {
+                    dbg!(color);
+                }
             } else {
                 *p = black;
             }

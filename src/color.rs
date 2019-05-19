@@ -1,9 +1,9 @@
 use crate::math::Vec3;
 use nalgebra_glm as glm;
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 use rgb::RGB8;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Color3 {
     pub r: f32,
     pub g: f32,
@@ -16,6 +16,20 @@ impl Color3 {
             r: r,
             g: g,
             b: b,
+        }
+    }
+    #[inline]
+    pub fn clamp(&mut self) {
+        self.r = glm::clamp_scalar(self.r, 0.0, 1.0);
+        self.g = glm::clamp_scalar(self.g, 0.0, 1.0);
+        self.b = glm::clamp_scalar(self.b, 0.0, 1.0);
+    }
+    #[inline]
+    pub fn clamped(&self) -> Self {
+        Color3 {
+            r: glm::clamp_scalar(self.r, 0.0, 1.0),
+            g: glm::clamp_scalar(self.g, 0.0, 1.0),
+            b: glm::clamp_scalar(self.b, 0.0, 1.0),
         }
     }
     #[inline]
@@ -63,6 +77,13 @@ impl Add for Color3 {
         }
     }
 }
+impl AddAssign for Color3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+    }
+}
 impl Sub for Color3 {
     type Output = Self;
 
@@ -72,6 +93,13 @@ impl Sub for Color3 {
             g: self.g - rhs.g,
             b: self.b - rhs.b,
         }
+    }
+}
+impl SubAssign for Color3 {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.r -= rhs.r;
+        self.g -= rhs.g;
+        self.b -= rhs.b;
     }
 }
 impl Mul for Color3 {
@@ -101,6 +129,13 @@ impl Mul<Color3> for f32 {
 
     fn mul(self, rhs: Color3) -> Color3 {
         rhs * self
+    }
+}
+impl MulAssign for Color3 {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.r *= rhs.r;
+        self.g *= rhs.g;
+        self.b *= rhs.b;
     }
 }
 impl Div for Color3 {
@@ -134,5 +169,12 @@ impl Div<Color3> for f32 {
             g: self / rhs.g,
             b: self / rhs.b,
         }
+    }
+}
+impl DivAssign for Color3 {
+    fn div_assign(&mut self, rhs: Self) {
+        self.r /= rhs.r;
+        self.g /= rhs.g;
+        self.b /= rhs.b;
     }
 }
