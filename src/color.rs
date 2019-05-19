@@ -19,6 +19,14 @@ impl Color3 {
         }
     }
     #[inline]
+    pub fn gray(a: f32) -> Self {
+        Color3 {
+            r: a,
+            g: a,
+            b: a,
+        }
+    }
+    #[inline]
     pub fn clamp(&mut self) {
         self.r = glm::clamp_scalar(self.r, 0.0, 1.0);
         self.g = glm::clamp_scalar(self.g, 0.0, 1.0);
@@ -62,6 +70,14 @@ impl Color3 {
             r: (self.r * 255.0) as u8,
             g: (self.g * 255.0) as u8,
             b: (self.b * 255.0) as u8,
+        }
+    }
+
+    pub fn mix(&self, other: &Color3, alpha: f32) -> Color3 {
+        Color3 {
+            r: self.r * (1.0 - alpha) + other.r * alpha,
+            g: self.g * (1.0 - alpha) + other.g * alpha,
+            b: self.b * (1.0 - alpha) + other.b * alpha,
         }
     }
 }
