@@ -1,6 +1,6 @@
 use crate::math::*;
 use crate::Material;
-use std::sync::Arc;
+use std::sync::Arc as Shared;
 
 #[derive(Debug)]
 pub struct Ray {
@@ -24,11 +24,11 @@ impl Ray {
 pub struct Hit {
     pub distance: Scalar,
     pub normal: Vec3,
-    pub material: Arc<Material>,
+    pub material: Shared<Material>,
     // TODO: more information (primitive id, etc)
 }
 impl Hit {
-    pub fn new(distance: Scalar, normal: Vec3, material: &Arc<Material>) -> Self {
+    pub fn new(distance: Scalar, normal: Vec3, material: &Shared<Material>) -> Self {
         Hit {
             distance: distance,
             normal: normal,

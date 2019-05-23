@@ -16,3 +16,10 @@ impl World {
 
     // TODO: pub fn trace(...)
 }
+impl Default for World {
+    fn default() -> Self {
+        World {
+            primitives: vec![],
+        }
+    }
+}

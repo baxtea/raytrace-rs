@@ -1,27 +1,33 @@
-/**
- * UE4-like material model defined by roughness, metallic, and albedo
- */
 use crate::math::Vec3;
 use crate::{Ray, Color3};
 use nalgebra_glm as glm;
 use std::f32::consts::PI;
 
-// TODO: textures
-// TODO: emissive
+/**
+ * A physically-based material model
+ * TODO: textures
+ * TODO: should area lights be implemented by adding an emissive component?
+ */
 #[derive(Debug, Copy, Clone)]
 pub struct Material {
     pub roughness: f32,
     pub metallic: f32,
     pub albedo: Color3,
+    pub reflectance: Color3,
+    pub transmittance: Color3,
     pub ior: f32,
+    pub fresnel_ior: f32, // separate the IOR used in shading from the IOR used for refraction, solely for artistic expressiveness (not physically-based)
 }
 impl Material {
-    pub fn new(roughness: f32, metallic: f32, albedo: Color3, ior: f32) -> Self {
+    pub fn new(roughness: f32, metallic: f32, albedo: Color3, reflectance: Color3, transmittance: Color3, ior: f32) -> Self {
         Material {
             roughness: roughness,
             metallic: metallic,
             albedo: albedo,
+            reflectance: reflectance,
+            transmittance: transmittance,
             ior: ior,
+            fresnel_ior: ior,
         }
     }
 
@@ -60,8 +66,9 @@ impl Material {
         let g = g1_l * g1_v;
 
         // F: schlick's fresnel approximation
-        let sqrt_f0 = (1.0 - self.ior) / (1.0 + self.ior); // the 1.0 is the
+        let sqrt_f0 = (1.0 - self.fresnel_ior) / (1.0 + self.fresnel_ior); // the 1.0 is the IOR of the material the ray is exiting (assumed air)
         let f0 = Color3::gray(sqrt_f0 * sqrt_f0).mix(&self.albedo, self.metallic);
+        // TODO: this forumula is a bad approximation for metals
         let f = f0 + (Color3::gray(1.0) - f0) * (1.0 - voh).powi(5);
 
         let specular = (d * f * g) / (4.0 * nol * nov);
@@ -76,9 +83,9 @@ impl Material {
     }
 }
 
-// a fairly rough pink material
+// a fairly rough pink plastic
 impl Default for Material {
     fn default() -> Self {
-        Material::new(0.5, 0.0, Color3::new(1.0, 0.0, 1.0), 3.5)
+        Material::new(0.5, 0.0, Color3::new(1.0, 0.0, 1.0), Color3::gray(0.0), Color3::gray(0.0), 5.0)
     }
 }
